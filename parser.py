@@ -89,20 +89,23 @@ def atom () :
 
 def code (e, true_line, false_line) :
    global line
-   line += 10
-   my_line = line
    type = e[0]
    left = e[1]
    right = e[2]   
    if type == 'NOT' :
-       right_line = code (left, false_line, true_line)
+       left_line = code (left, false_line, true_line)
+       my_line = left_line
    elif type == 'OR' :
        right_line = code (right, true_line, false_line)
        left_line = code (left, true_line, right_line)
+       my_line = left_line
    elif type == 'AND' :
        right_line = code (right, true_line, false_line)
        left_line = code (left, right_line, false_line)
+       my_line = left_line
    elif type == 'NUM' :
+       line += 10
+       my_line = line
        print "%d %s T %d F %d" % (my_line, left, true_line, false_line)
    else :
        print "bad code"
@@ -110,15 +113,16 @@ def code (e, true_line, false_line) :
 
 def main () :
     global input
-    input = ['NOT', '(', 123, 'OR', 234, ')', 'AND', 456, 'AND', 'NOT', 890, 'OR', 777]
+    input = ['(', '(', '(', 10, 'AND', 20, ')', 'AND', 30, ')', 'AND', '(', 40, 'OR', 50, ')',')', 'OR', '(', 60, 'AND', 70, ')' ]
+    # input = ['NOT', '(', 123, 'OR', 234, ')', 'AND', 456, 'AND', 'NOT', 890, 'OR', 777]
     # input = ['(', 123, 'OR', 234, ')', 'AND', 456, 'AND', 890, 'OR', 777]
     print input
     eat ()
     e = expr ()
     print e
 
-    code (e, 1000, 2000)
-
+    s = code (e, 1000, 2000)
+    print "start %d" % s
 
 if __name__ == "__main__":
     main()
