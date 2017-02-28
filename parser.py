@@ -1,9 +1,11 @@
 
+# stmt = [ expr ]
 # expr = expr OR term | term 
 # term = term AND factor | factor
 # factor = NOT factor | atom
 # atom = ( expr ) | NUM 
 
+# stmt = [ expr ]
 # expr = term expr_
 # expr_ = OR term expr_ | eps
 # term = factor term_
@@ -25,6 +27,19 @@ def eat () :
         lookahead = input.pop(0)
     else :
         lookahead = None
+
+def stmt () :
+    global lookahead
+    if lookahead == '[' :
+        eat ()
+        e = expr ()
+        if lookahead == ']' :
+            eat ()
+            return e
+        else :
+            print "parse error, ']' expected" 
+    else :
+        print "parse error, unexpected token"
 
 def expr () :
     l = term ()
@@ -77,13 +92,13 @@ def atom () :
             eat ()
             return a
         else :
-            print "parse error 1"
+            print "parse error, ')' expected" 
     elif isinstance (lookahead, int) == True :
         a = lookahead
         eat ()
         return ('NUM', a, None)
     else :
-        print "parse error 2"
+        print "parse error, unexpected token"
       
        
 
@@ -113,16 +128,18 @@ def code (e, true_line, false_line) :
 
 def main () :
     global input
-    input = ['(', '(', '(', 10, 'AND', 20, ')', 'AND', 30, ')', 'AND', '(', 40, 'OR', 50, ')',')', 'OR', '(', 60, 'AND', 70, ')' ]
-    # input = ['NOT', '(', 123, 'OR', 234, ')', 'AND', 456, 'AND', 'NOT', 890, 'OR', 777]
-    # input = ['(', 123, 'OR', 234, ')', 'AND', 456, 'AND', 890, 'OR', 777]
+    input = ['[', '(', '(', '(', 10, 'AND', 20, ')', 'AND', 30, ')', 'AND', '(', 40, 'OR', 50, ')',')', 'OR', '(', 60, 'AND', 70, ')', ']' ]
+    # input = ['[', 'NOT', '(', 123, 'OR', 234, ')', 'AND', 456, 'AND', 'NOT', 890, 'OR', 777, ']']
+    # input = ['[', '(', 123, 'OR', 234, ')', 'AND', 456, 'AND', 890, 'OR', 777, ']']
     print input
     eat ()
-    e = expr ()
-    print e
+    s = stmt ()
+    if lookahead != None :
+        print "junk at the end, starting %s" % lookahead
+    print s
 
-    s = code (e, 1000, 2000)
-    print "start %d" % s
+    st = code (s, 1000, 2000)
+    print "start %d" % st
 
 if __name__ == "__main__":
     main()
